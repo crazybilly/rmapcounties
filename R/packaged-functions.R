@@ -177,6 +177,9 @@ return(us.map2)
 #' @param fipscodes  a data frame of fips codes for all counties with bannerized codes added. If NA, data from the tigris package is modified to work
 #' @param output a character vector describing what output you want. Available options include, "nearbydf", "mapdata", "hobsonslist" and "map"
 #'
+#' @details countieswithindrivingdistance() is not vectorized--you cannot pass in vector of centerlocations (or more usefully, a vector of centerlocations and a second vector of driving distances). Use lapply() for this.
+
+#'
 #' @return if more than one output is selected, a list containing values of each. If only one output is selected, the object itself is return, without being wrapped in a list. Outputs include:
 #' \itemize{
 #'  \item{"nearbydf"}{A data frame of nearby counties and their distance to centerlocation}
@@ -184,6 +187,7 @@ return(us.map2)
 #'  \item{"hobsonslist"}{A character vector ready to paste into a Hobsons filter }
 #'  \item{"map"}{A pre-generated leaflet map}
 #'  }
+#'
 #'
 #' @export
 #'
@@ -273,7 +277,7 @@ countieswithindrivingdistance <- function(
   nearbycounties %<>%
     bind_cols(drivingdistance) %>%
     mutate(
-      drivingtime = lubridate::dminutes(minutes)
+        drivingtime = lubridate::dminutes(minutes)
       , withinrange = drivingtime <= drivingcutoff
     ) %>%
     left_join(bannerizedfips %>% select(GEOID, bannercode), by='GEOID')
