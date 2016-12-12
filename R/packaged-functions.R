@@ -272,7 +272,7 @@ countieswithindrivingdistance <- function(
   revcodedcounties  <- nearbycounties %>%
     select(lon, lat) %>%
     apply(1, function(x) {
-      ggmap::revgeocode(as.numeric(x), messag)
+      ggmap::revgeocode(as.numeric(x))
     })
 
   message(paste("\nFinding driving distance from county centers to", centerlocation, "---------------------------\n\n"))
@@ -315,15 +315,21 @@ countieswithindrivingdistance <- function(
     )
 
 
+  nearbyminutes  <- nearbycounties %>% filter(withinrange) %>% magrittr::extract2("minutes")
+
+  if(length(nearbyminutes) == 1) {
+    nearbyminutes  <- c(nearbyminutes, nearbyminutes * 2)
+  }
+
   pal <- leaflet::colorBin("Blues"
-                  , nearbycounties %>% filter(withinrange) %>% magrittr::extract2("minutes")
+                  , nearbyminutes
                   , 3, pretty = FALSE)
 
 
   countymap  <- leaflet::leaflet(nearbymap) %>%
     leaflet::addTiles() %>%
     leaflet::addPolygons(
-      fillColor = ~colorBin("Blues",minutes,3) #this is broken
+        fillColor = ~pal(minutes)
       , weight = .5
       , opacity = .7
     )
