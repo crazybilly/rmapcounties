@@ -197,12 +197,14 @@ countieswithindrivingdistance <- function(
   , considerationradius = drivingtime * 1.5
   , countymaps = NA
   , fipscodes = NA
-  , output = c("nearbydf","mapdata","hobsonslist","map")
+  , output = c("all","nearbydf","mapdata","hobsonslist","map")
   ){
 
 
 
   placeofinterest  <- centerlocation
+
+  message(paste("\nGeocoding", centerlocation, "---------------------------\n\n"))
 
   placeofinterest <- ggmap::geocode(placeofinterest) %>%
     mutate(placename = placeofinterest )
@@ -264,11 +266,16 @@ countieswithindrivingdistance <- function(
     magrittr::inset("distance", value = distance) %>%
     filter(distance <= generalcutoffinmiles)
 
+
+  message(paste("\nFinding county centers nearby", centerlocation, "---------------------------\n\n"))
+
   revcodedcounties  <- nearbycounties %>%
     select(lon, lat) %>%
     apply(1, function(x) {
-      ggmap::revgeocode(as.numeric(x))
+      ggmap::revgeocode(as.numeric(x), messag)
     })
+
+  message(paste("\nFinding driving distance from county centers to", centerlocation, "---------------------------\n\n"))
 
   drivingdistance  <- revcodedcounties %>%
     ggmap::mapdist( to = placeofinterest$placename, mode = 'driving' )
@@ -308,15 +315,15 @@ countieswithindrivingdistance <- function(
     )
 
 
-  pal <- colorBin("Blues"
+  pal <- leaflet::colorBin("Blues"
                   , nearbycounties %>% filter(withinrange) %>% magrittr::extract2("minutes")
                   , 3, pretty = FALSE)
 
 
-  countymap  <- leaflet(nearbymap) %>%
-    addTiles() %>%
-    addPolygons(
-      fillColor = ~pal(minutes)
+  countymap  <- leaflet::leaflet(nearbymap) %>%
+    leaflet::addTiles() %>%
+    leaflet::addPolygons(
+      fillColor = ~colorBin("Blues",minutes,3) #this is broken
       , weight = .5
       , opacity = .7
     )
@@ -465,7 +472,7 @@ drivablecountiesvsregion  <- function(
     mutate(
         edgecolor = fillna(edgecolor, fill = '#AAAAAA')
       , popuptext = paste0(NAME,"<br>",bannercode)
-      , distancecatg = cut(minutes, 3, labels = F)
+      , distancecatg = cut(rank(minutes,tie.method = 'first'), 3, labels = F)
       , inregion = fillna(inregion, F)
       , withinrange = fillna(withinrange, F)
     )
