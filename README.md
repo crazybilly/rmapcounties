@@ -1,7 +1,7 @@
 rmapcounties
------------------------------------
-map counties using leaflet
 ===================================
+map counties using leaflet
+-----------------------------------
 
 This R package provides some tools to make it easier to map US counties. Tools include:
 
