@@ -173,7 +173,7 @@ return(us.map2)
 #' @param centerlocation a character string of a location acting as the center from which you want to measure
 #' @param drivingtime numeric value of time, in minutes, that you want to drive
 #' @param considerationradius numeric value of distance, in miles, that you want to consider. Limits the number of geocoded counties. Recommended to be much larger than drivingtime, perhaps 50% larger, to ensure that all counties are considered.
-#' @param countymaps a spatialpolygonsdataframe. If NA, data is downloaded and read from the US Census
+#' @param countymaps a spatialpolygonsdataframe. If NA, data is downloaded and read from the US Census via getcountymaps().
 #' @param fipscodes  a data frame of fips codes for all counties with bannerized codes added. If NA, data from the tigris package is modified to work
 #' @param output a character vector describing what output you want. Available options include, "nearbydf", "mapdata", "hobsonslist" and "map"
 #'
