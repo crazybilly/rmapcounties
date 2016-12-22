@@ -4,14 +4,14 @@
 \alias{mapregion}
 \title{Map a Geo Region}
 \usage{
-mapregion(regionfile, countymaps = NA, fipscodes = NA)
+mapregion(region, countymaps = NA, fipscodes = NA)
 }
 \arguments{
-\item{regionfile}{the location of a csv with one column: bannercode}
-
 \item{countymaps}{a spatialpolygonsdataframe. If NA, data is downloaded and read from the US Census}
 
 \item{fipscodes}{a data frame of fips codes for all counties with bannerized codes added. If NA, data from the tigris package is modified to work}
+
+\item{regionfile}{either a data frame or the file location of a csv with a column named "bannercode" of Banner-style FIPS codes}
 }
 \value{
 a spatialPolygonsDataFrame of the region. As a side effect, generates a leaflet map of the counties

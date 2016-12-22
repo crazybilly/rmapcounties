@@ -1,21 +1,34 @@
 
 #' Map a Geo Region
 #'
-#' @param regionfile the location of a csv with one column: bannercode
+#' @param regionfile either a data frame or the file location of a csv with a column named "bannercode" of Banner-style FIPS codes
 #' @param countymaps a spatialpolygonsdataframe. If NA, data is downloaded and read from the US Census
 #' @param fipscodes  a data frame of fips codes for all counties with bannerized codes added. If NA, data from the tigris package is modified to work
 #'
 #' @return a spatialPolygonsDataFrame of the region. As a side effect, generates a leaflet map of the counties
 #' @export
 #'
-mapregion  <- function(regionfile, countymaps = NA, fipscodes = NA) {
+mapregion  <- function(region, countymaps = NA, fipscodes = NA) {
+
+
+  if(grepl("data.frame", class(regiondf) ) ) {
+    myregion  <- region
+  } else {
+    myregion  <- read.tidy(region)
+  }
+
+  myregion %<>%
+    mutate(inregion = "#00FF00")
+
+
+
 
   filename  <- regionfile
 
   # 1 column data frame
   #    bannercode = all codes in region, with style IL123
   myregion <- read.tidy(filename) %>%
-    mutate(inregion = "#00FF00")
+
 
 
   # get maps ----------------------------------------------------------------

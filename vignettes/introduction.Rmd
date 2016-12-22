@@ -1,0 +1,90 @@
+---
+title: "RmapCounties"
+author: "Jake Tolbert"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Rmapcounties is designed to make it easy to pull regions around a particular location. The main usage is to find a list of counties within a certain driving distance of a particular address, allowing you to then easily create a group of people to invite to an event at the address.
+
+I wrote the package as part of my work at [Millikin University's Alumni & Development Center](http://millikin.edu/alumni). We use Banner Advancement which uses modified FIPS codes (eg. "IL123") to create what they call "georegions." As such, rmapscounties provides tools that work with these style of codes.
+
+## Getting Maps via getcountymaps()
+
+The most important step, of course, is getting the county maps. `getcountymaps()` provides a function to get county boundaries from the US Census Bureau in a format that's easily mapped. To use it, just call the function and assign it to an object that you want to contain your map data:
+
+```
+usmap  <- getcountymaps()
+```
+
+By default, `getcountymaps()` downloads the data and unzips it in the ./data directory, creating it if need be. You can use the `dest` argument to change that directory.
+
+```
+# downloads the data and unzips it into C:/mapdirectory
+usmap  <- getcountymaps(dest = 'C:/mapdirectory')
+```
+
+If you've already downloaded the data, you can use set `local=T` and point the `filelocation` argument at the unzipped directory where your .shp files live. Note that you're calling out the *directory* name rather than the file names.
+
+```
+# assumes you've already downloaded the data and unzipped it into the directory C:/mapdirectory/tiger
+usmap  <- getcountymaps(filelocation = 'C:/mapdirectory/tiger', local = T)
+```
+
+Note that, by default, the `continentalonly` argument is set to `TRUE`, which strips out Alaska, Hawaii, and other outlying islands--this allows the map to zoom to the entire US by default. If you need the extracontinental data, set `continentalonly = F`.
+
+
+## Find Counties Within Driving Distance 
+
+Once you've downloaded the map data, you're ready to find counties within driving distance of your location. `countieswithindrivingdistance()` returns a list of counties and the metadata about them:
+
+```
+countiesAroundDecatur  <- countieswithindrivingdistance(centerlocation = '1184 W Main, Decatur IL', countymaps = usmap )
+```
+
+The function defaults to a 90 min driving time, but the `drivingtime` argument allows you to adjust that. 
+
+The returned value is usually a list of `class("drivingdistance")` with the following items:
+
+    - `nearbydf` a data frame of nearby counties and their distance to the centerlocation
+    - `mapdata` a SpaitalPolygonsDataFrame of the nearby counties appropriate for use in a leaflet map
+    - `hobsonslist` a character vector of the Banner-style FIPS codes, ready to paste into a Hobsons filter
+    - `map` A pre-generated leaflet map
+    
+However, if only one output type is specified using the `output` argument, that output is returned by itself without being wrapped in a list.
+
+
+## Map Region
+
+Often, regions have already been created in Banner. If you want to map a region to see where it extends to, `mapregion()` allows you to do so. Pass it a data frame or the location of a csv with banner-style FIPS codes in a column named `bannercode` and it will return a [leaflet](https://rstudio.github.io/leaflet/) map with the counties in the region shaded.
+
+
+## Drivable Counties vs. Regions
+
+At times, you need to compare an existing georegion to a drivable region. `drivablecountiesvsregion()` provides the tools to do so. 
+    - The `regiondf` argument takes  a region data frame or file location of a csv with Banner-style FIPS codes. 
+    - The `drivingdistance` argument takes either a numeric driving time (in minutes) or an object of class(drivingdistance), ie. a list generated via `countieswithindrivingdistance()`. Using the latter allows you to avoid geocoding the same addresses over and over.
+    
+The function returns a list with metadata:
+    - `nearbydf` provides a data frame of the nearby, drivable counties and their distance to the center of the region.
+    - `mapdata` is a SpaitalPolygonsDataFrame of the nearby counties appropriate for use in a leaflet map
+    - `outsidecountiesdf` is a data frame of counties that arewithin driving range but outside the original region
+    - `map` is a leaflet map showing what counties are in the region, and which are drivable, but outside the region.
+
+## Bannerizing FIPS Codes
+
+To create a data frame of [county FIPS codes](https://en.wikipedia.org/wiki/FIPS_county_code), use `makebannerizedfips()`.
+
+```
+fipscodes  <- makebannerizedfips()
+```
+
+This uses the data from `tigris::fips_codes` and adds two new columns, one with Banner-style codes and a GEOID, which is what the data from `getcountymaps()` uses. 
+
+This function is primarily used internally by other functions, but is exported in case you need to reference the data manually or for other uses.
+
+

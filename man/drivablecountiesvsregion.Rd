@@ -11,7 +11,7 @@ drivablecountiesvsregion(regiondf, drivingdistance, countymaps = NA,
 \arguments{
 \item{regiondf}{an existing data frame or a file URL}
 
-\item{drivingdistance}{an object of class drivingdistance or a numeric distance}
+\item{drivingdistance}{an object of class drivingdistance or a numeric distance from the center of regiondf}
 
 \item{countymaps}{a spatialpolygonsdataframe. If NA, data is downloaded and read from the US Census}
 
@@ -22,13 +22,13 @@ drivablecountiesvsregion(regiondf, drivingdistance, countymaps = NA,
 \value{
 if more than one output is selected, a list containing values of each. If only one output is selected, the object itself is return, without being wrapped in a list. Outputs include:
 \itemize{
- \item{"nearbydf"}{A data frame of nearby counties and their distance to centerlocation}
- \item{"mapdata"}{A SpaitalPolygonsDataFrame of the nearby counties appropriate for use in a leaflet map}
- \item{"outsidecountiesdf"}{A data frame of counties that are within driving range but outside the regiondf}
- \item{"map"}{A pre-generated leaflet map}
+ \item{"nearbydf"}{ a data frame of nearby counties and their distance to the center of the region}
+ \item{"mapdata"}{ a SpaitalPolygonsDataFrame of the nearby counties appropriate for use in a leaflet map}
+ \item{"outsidecountiesdf"}{ a data frame of counties that are within driving range but outside the regiondf}
+ \item{"map"}{ a pre-generated leaflet map}
  }
 }
 \description{
-
+Compare an exiting georegion to a list of drivable counites or generate the drivable list based on a driving time radius.
 }
 

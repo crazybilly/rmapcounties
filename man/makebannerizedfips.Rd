@@ -7,7 +7,7 @@
 makebannerizedfips()
 }
 \value{
-a data frame
+a data frame of all the FIPS codes in the US.
 }
 \description{
 modify the default list of fips county codes to add columns for joining with Banner and Census Bureau. Uses the fips_codes data from the tigris package.

@@ -1,12 +1,11 @@
 Package: rmapcounties
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: RMapCounties
+Version: 0.2.0
+Author: Jake tolbert
+Maintainer: Jake Tolbert <crazybilly@gmail.com>
+Description: Rmapcounties is designed to make it easy to pull regions around a particular location. The main usage is to find a list of counties within a certain driving distance of a particular address, allowing you to then easily create a group of people to invite to an event at the address.    Written at Millikin University's Alumni & Development Center, it was designed to work with Banner Advancement which uses modified FIPS codes (eg. "IL123") to create what they call "georegions." As such, rmapscounties provides tools that work with these style of codes.
+License: GPL v. 3.0 or later
 Encoding: UTF-8
 LazyData: true
 Imports:
@@ -15,3 +14,6 @@ Imports:
     leaflet,
     muadc
 RoxygenNote: 5.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr

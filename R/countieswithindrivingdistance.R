@@ -4,23 +4,20 @@
 #'
 #' @param centerlocation a character string of a location acting as the center from which you want to measure
 #' @param drivingtime numeric value of time, in minutes, that you want to drive
-#' @param considerationradius numeric value of distance, in miles, that you want to consider. Limits the number of geocoded counties. Recommended to be much larger than drivingtime, perhaps 50% larger, to ensure that all counties are considered.
+#' @param considerationradius numeric value of distance, in miles, that you want to consider. Limits the number of geocoded counties. Recommended to be much larger than drivingtime, perhaps 50 percent larger, to ensure that all counties are considered.
 #' @param countymaps a spatialpolygonsdataframe. If NA, data is downloaded and read from the US Census via getcountymaps().
 #' @param fipscodes  a data frame of fips codes for all counties with bannerized codes added. If NA, data from the tigris package is modified to work
 #' @param output a character vector describing what output you want. Available options include, "nearbydf", "mapdata", "hobsonslist" and "map"
 #'
-#' @details countieswithindrivingdistance() is not vectorized--you cannot pass in vector of centerlocations (or more usefully, a vector of centerlocations and a second vector of driving distances). Use lapply() for this.
+#' @details this function is not vectorized--you cannot pass in vector of centerlocations (or more usefully, a vector of centerlocations and a second vector of driving distances). Use lapply() for this.
 #'
-#'
-#' @return if more than one output is selected, a list containing values of each. If only one output is selected, the object itself is return, without being wrapped in a list. Outputs include:
+#' @return if more than one output is selected, a list containing values of each. If only one output is selected, the object itself is returned, without being wrapped in a list. Outputs include:
 #' \itemize{
-#'  \item{"nearbydf"}{A data frame of nearby counties and their distance to centerlocation}
-#'  \item{"mapdata"}{A SpaitalPolygonsDataFrame of the nearby counties appropriate for use in a leaflet map}
-#'  \item{"hobsonslist"}{A character vector ready to paste into a Hobsons filter }
-#'  \item{"map"}{A pre-generated leaflet map}
+#'  \item{"nearbydf"}{ a data frame of nearby counties and their distance to centerlocation}
+#'  \item{"mapdata"}{ a SpaitalPolygonsDataFrame of the nearby counties appropriate for use in a leaflet map}
+#'  \item{"hobsonslist"}{ a character vector ready to paste into a Hobsons filter }
+#'  \item{"map"}{ a pre-generated leaflet map}
 #'  }
-#'
-#'
 #' @export
 #'
 countieswithindrivingdistance <- function(
