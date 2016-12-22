@@ -1,6 +1,3 @@
-
-# counties within driving distance of a location ----------------------
-
 #' Counties within Driving Distance
 #'
 #' @description generate a list of counties within a particular driving distance of a location
@@ -13,7 +10,7 @@
 #' @param output a character vector describing what output you want. Available options include, "nearbydf", "mapdata", "hobsonslist" and "map"
 #'
 #' @details countieswithindrivingdistance() is not vectorized--you cannot pass in vector of centerlocations (or more usefully, a vector of centerlocations and a second vector of driving distances). Use lapply() for this.
-
+#'
 #'
 #' @return if more than one output is selected, a list containing values of each. If only one output is selected, the object itself is return, without being wrapped in a list. Outputs include:
 #' \itemize{

@@ -6,7 +6,8 @@
 #' @param dest the local destination where the files should be downloaded to.
 #' @param local a logical value indicating whether filelocation is a local address or not.
 #'
-#' @return
+#' @return a SpatialPolygonsDataFrame with polygons for each county within the United States.
+#'
 #' @export
 getcountymaps  <- function(
   filelocation = "http://www2.census.gov/geo/tiger/GENZ2015/shp/cb_2015_us_county_20m.zip"

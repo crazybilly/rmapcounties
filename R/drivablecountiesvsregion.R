@@ -16,8 +16,6 @@
 #'  \item{"map"}{A pre-generated leaflet map}
 #'  }
 #' @export
-#'
-#' @examples
 drivablecountiesvsregion  <- function(
   regiondf
   , drivingdistance
