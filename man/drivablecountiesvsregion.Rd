@@ -31,4 +31,3 @@ if more than one output is selected, a list containing values of each. If only o
 \description{
 Compare an exiting georegion to a list of drivable counites or generate the drivable list based on a driving time radius.
 }
-

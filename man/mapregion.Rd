@@ -19,4 +19,3 @@ a spatialPolygonsDataFrame of the region. As a side effect, generates a leaflet 
 \description{
 Map a Geo Region
 }
-

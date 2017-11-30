@@ -15,4 +15,3 @@ a two column data frame with the longitude and latitude of the center point of p
 \description{
 Get the Center of a Bunch of Polygons
 }
-

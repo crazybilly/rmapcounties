@@ -37,4 +37,3 @@ generate a list of counties within a particular driving distance of a location
 \details{
 this function is not vectorized--you cannot pass in vector of centerlocations (or more usefully, a vector of centerlocations and a second vector of driving distances). Use lapply() for this.
 }
-

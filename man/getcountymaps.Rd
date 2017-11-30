@@ -5,7 +5,7 @@
 \title{Get County Map}
 \usage{
 
-  getcountymaps(filelocation = "http://www2.census.gov/geo/tiger/GENZ2015/shp/cb_2015_us_county_20m.zip",
+  getcountymaps(filelocation = "https://www2.census.gov/geo/tiger/GENZ2016/shp/cb_2016_us_county_20m.zip",
   dest = "data", local = F, continentalonly = T)
 }
 \arguments{
@@ -23,4 +23,3 @@ a SpatialPolygonsDataFrame with polygons for each county within the United State
 \description{
 Create a SpatialPolygonsDataFrame of all the counties in the continental US
 }
-
