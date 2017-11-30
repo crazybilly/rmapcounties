@@ -96,93 +96,106 @@ countieswithindrivingdistance <- function(
     filter(distance <= generalcutoffinmiles)
 
 
-  message(paste("\nFinding county centers nearby", centerlocation, "---------------------------\n\n"))
 
-  revcodedcounties  <- nearbycounties %>%
-    select(lon, lat) %>%
-    apply(1, function(x) {
-      ggmap::revgeocode(as.numeric(x))
-    })
+# Allow user to abort if there's a ton of nearby counties -----------------
 
-  message(paste("\nFinding driving distance from county centers to", centerlocation, "---------------------------\n\n"))
+  userabort  <- readline(paste("There are", nrow(nearbycounties), "nearby counties. What do you want to do? [A]bort or [C]ontinue? [C] ") ) %>%
+      tolower()
 
-  drivingdistance  <- revcodedcounties %>%
-    ggmap::mapdist( to = placeofinterest$placename, mode = 'driving' )
+  if(userabort == 'a') {
 
+      stop(return(nearbycounties))
 
-  nearbycounties %<>%
-    bind_cols(drivingdistance) %>%
-    mutate(
-      drivingtime = lubridate::dminutes(minutes)
-      , withinrange = drivingtime <= drivingcutoff
-    ) %>%
-    left_join(bannerizedfips %>% select(GEOID, bannercode), by='GEOID')
-
-
-
-  # output for Hobsons filter writing ---------------------------------------
-
-
-  hobsonslist  <- nearbycounties %>%
-    filter(withinrange)
-
-  hobsonslist  <- paste(hobsonslist$bannercode, collapse = "~")
-
-
-
-  # map stuff ---------------------------------------------------------------
-
-  countyindex  <- us.map@data$GEOID %in% (nearbycounties %>% filter(withinrange) %>% magrittr::extract2("GEOID") )
-
-  nearbymap  <- us.map[countyindex, ]
-
-  nearbymap@data  <- nearbymap@data %>%
-    left_join(
-      nearbycounties %>%
-        select(GEOID, minutes)
-      , by = 'GEOID'
-    )
-
-
-  nearbyminutes  <- nearbycounties %>% filter(withinrange) %>% magrittr::extract2("minutes")
-
-  if(length(nearbyminutes) == 1) {
-    nearbyminutes  <- c(nearbyminutes, nearbyminutes * 2)
-  }
-
-  pal <- leaflet::colorBin("Blues"
-                           , nearbyminutes
-                           , 3, pretty = FALSE)
-
-
-  countymap  <- leaflet::leaflet(nearbymap) %>%
-    leaflet::addTiles() %>%
-    leaflet::addPolygons(
-      fillColor = ~pal(minutes)
-      , weight = .5
-      , opacity = .7
-    )
-
-
-  # create output -----------------------------------------------------------
-
-  alloutput  <- list(
-    nearby = nearbycounties
-    , mapdata = nearbymap
-    , hobsonslist = hobsonslist
-    , map = countymap
-  )
-
-  class(alloutput)  <- c("list","drivingdistance")
-
-
-  if(grepl("all",output) ) {
-    return(alloutput)
-  } else if(length(output) > 1) {
-    return(alloutput[output])
   } else {
-    return(alloutput[[output]])
+
+
+
+    message(paste("\nFinding driving distance from county centers to", centerlocation, "---------------------------\n\n"))
+
+    revcodedcounties  <- nearbycounties %>%
+      left_join(bannerizedfips, by = c('STATEFP' = 'state_code', 'COUNTYFP' = 'county_code')) %>%
+      mutate(countyname = paste(NAME, "County,", state)) %>%
+      magrittr::extract2('countyname')
+
+
+    drivingdistance  <- revcodedcounties %>%
+      ggmap::mapdist( to = placeofinterest$placename, mode = 'driving' )
+
+
+    nearbycounties %<>%
+      bind_cols(drivingdistance) %>%
+      mutate(
+        drivingtime = lubridate::dminutes(minutes)
+        , withinrange = drivingtime <= drivingcutoff
+      ) %>%
+      left_join(bannerizedfips %>% select(GEOID, bannercode), by='GEOID')
+
+
+
+    # output for Hobsons filter writing ---------------------------------------
+
+
+    hobsonslist  <- nearbycounties %>%
+      filter(withinrange)
+
+    hobsonslist  <- paste(hobsonslist$bannercode, collapse = "~")
+
+
+
+    # map stuff ---------------------------------------------------------------
+
+    countyindex  <- us.map@data$GEOID %in% (nearbycounties %>% filter(withinrange) %>% magrittr::extract2("GEOID") )
+
+    nearbymap  <- us.map[countyindex, ]
+
+    nearbymap@data  <- nearbymap@data %>%
+      left_join(
+        nearbycounties %>%
+          select(GEOID, minutes)
+        , by = 'GEOID'
+      )
+
+
+    nearbyminutes  <- nearbycounties %>% filter(withinrange) %>% magrittr::extract2("minutes")
+
+    if(length(nearbyminutes) == 1) {
+      nearbyminutes  <- c(nearbyminutes, nearbyminutes * 2)
+    }
+
+    pal <- leaflet::colorBin("Blues"
+                             , nearbyminutes
+                             , 3, pretty = FALSE)
+
+
+    countymap  <- leaflet::leaflet(nearbymap) %>%
+      leaflet::addTiles() %>%
+      leaflet::addPolygons(
+        fillColor = ~pal(minutes)
+        , weight = .5
+        , opacity = .7
+      )
+
+
+    # create output -----------------------------------------------------------
+
+    alloutput  <- list(
+      nearby = nearbycounties
+      , mapdata = nearbymap
+      , hobsonslist = hobsonslist
+      , map = countymap
+    )
+
+    class(alloutput)  <- c("list","drivingdistance")
+
+
+    if(grepl("all",output) ) {
+      return(alloutput)
+    } else if(length(output) > 1) {
+      return(alloutput[output])
+    } else {
+      return(alloutput[[output]])
+    }
+
   }
 
 }
-

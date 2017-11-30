@@ -9,13 +9,15 @@
 #'
 #' @return a SpatialPolygonsDataFrame with polygons for each county within the United States.
 #'
+#' @import curl
 #' @export
 getcountymaps  <- function(
-  filelocation = "http://www2.census.gov/geo/tiger/GENZ2015/shp/cb_2015_us_county_20m.zip"
+  filelocation = "https://www2.census.gov/geo/tiger/GENZ2016/shp/cb_2016_us_county_20m.zip"
   , dest = "data"
   , local = F
   , continentalonly = T
 ) {
+
 
 
   # create dir if it doesn't exist ------------------------------------------
@@ -29,9 +31,11 @@ getcountymaps  <- function(
   if( !local ) {
 
     destfile = paste0(dest,"/tiger.zip")
+    exdir    = paste0(dest,"/tiger")
 
-    download.file(filelocation, destfile = destfile )
-    unzip(destfile, exdir = 'data/tiger')
+    curl::curl_download(filelocation, destfile = destfile )
+
+    unzip(destfile, exdir = exdir)
 
     shplocation  <- sub(".zip","",destfile)
 
@@ -48,7 +52,7 @@ getcountymaps  <- function(
   message(paste("shplocation = ", shplocation,"\n"))
   # Download county shape file from Tiger.
   # https://www.census.gov/geo/maps-data/data/cbf/cbf_counties.html
-  us.map <- rgdal::readOGR(dsn =path.expand(shplocation), layer = "cb_2015_us_county_20m", stringsAsFactors = FALSE)
+  us.map <- rgdal::readOGR(dsn =path.expand(shplocation), layer = "cb_2016_us_county_20m", stringsAsFactors = FALSE)
 
   if(continentalonly) {
     # Remove Alaska(2), Hawaii(15), Puerto Rico (72), Guam (66), Virgin Islands (78), American Samoa (60)
