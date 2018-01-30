@@ -6,12 +6,13 @@
 #' @param fipscodes  a data frame of fips codes for all counties with bannerized codes added. If NA, data from the tigris package is modified to work
 #'
 #' @return a spatialPolygonsDataFrame of the region. As a side effect, generates a leaflet map of the counties
+#' @import leaflet
 #' @export
 #'
 mapregion  <- function(region, countymaps = NA, fipscodes = NA) {
 
 
-  if(grepl("data.frame", class(regiondf) ) ) {
+  if(grepl("data.frame", class(region) ) ) {
     myregion  <- region
   } else {
     myregion  <- read.tidy(region)
@@ -19,15 +20,6 @@ mapregion  <- function(region, countymaps = NA, fipscodes = NA) {
 
   myregion %<>%
     mutate(inregion = "#00FF00")
-
-
-
-
-  filename  <- regionfile
-
-  # 1 column data frame
-  #    bannercode = all codes in region, with style IL123
-  myregion <- read.tidy(filename) %>%
 
 
 
@@ -75,7 +67,7 @@ mapregion  <- function(region, countymaps = NA, fipscodes = NA) {
     )
 
 
-  return(us.map2)
+  invisible(us.map2)
 
 
 }
