@@ -7,12 +7,13 @@
 #'
 #' @return a spatialPolygonsDataFrame of the region. As a side effect, generates a leaflet map of the counties
 #' @import leaflet
+#' @importFrom muadc read.tidy
 #' @export
 #'
 mapregion  <- function(region, countymaps = NA, fipscodes = NA) {
 
 
-  if(grepl("data.frame", class(region) ) ) {
+  if(any(grepl("data.frame", class(region)) ) ) {
     myregion  <- region
   } else {
     myregion  <- read.tidy(region)
@@ -43,7 +44,7 @@ mapregion  <- function(region, countymaps = NA, fipscodes = NA) {
   mapdata  <- bannerizedfips %>%
     left_join(myregion, by='bannercode') %>%
     mutate(
-      inregion  = fillna(inregion, fill = '#CCCCCC')
+        inregion  = fillna(inregion, fill = '#CCCCCC')
       , popuptext = paste(county,bannercode,sep = '<br>')
     )
 
@@ -60,14 +61,14 @@ mapregion  <- function(region, countymaps = NA, fipscodes = NA) {
   leaflet(us.map2) %>%
     addTiles() %>%
     addPolygons(
-      fillColor = ~inregion
-      , weight = .7
-      , opacity = .7
+        fillColor = ~inregion
+      , weight = .3
+      , opacity = 1
       , popup = ~popuptext
     )
 
 
-  invisible(us.map2)
+  # invisible(us.map2)
 
 
 }

@@ -7,9 +7,9 @@
 #'
 makebannerizedfips  <- function() {
 
-  tigris::fips_codes %>%
-    mutate(
-        bannercode = paste0(state,county_code)
+  dplyr::mutate(
+    tigris::fips_codes
+      , bannercode = paste0(state,county_code)
       , GEOID = paste0(state_code, county_code)
     )
 }
