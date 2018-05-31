@@ -8,6 +8,7 @@
 #' @param countymaps a spatialpolygonsdataframe. If NA, data is downloaded and read from the US Census via getcountymaps().
 #' @param fipscodes  a data frame of fips codes for all counties with bannerized codes added. If NA, data from the tigris package is modified to work
 #' @param output a character vector describing what output you want. Available options include, "nearbydf", "mapdata", "hobsonslist" and "map"
+#' @param key a Google Maps user API key
 #'
 #' @details this function is not vectorized--you cannot pass in vector of centerlocations (or more usefully, a vector of centerlocations and a second vector of driving distances). Use lapply() for this.
 #'
@@ -27,6 +28,7 @@ countieswithindrivingdistance <- function(
   , countymaps = NA
   , fipscodes = NA
   , output = c("all","nearbydf","mapdata","hobsonslist","map")
+  , key = Sys.getenv('GOOGLE_MAPS_KEY')
 ){
 
 
@@ -35,7 +37,8 @@ countieswithindrivingdistance <- function(
 
   message(paste("\nGeocoding", centerlocation, "---------------------------\n\n"))
 
-  placeofinterest <- ggmap::geocode(placeofinterest) %>%
+  placeofinterest <- googleway::google_geocode(placeofinterest, key = key) %>%
+    googleway::geocode_coordinates() %>%
     mutate(placename = placeofinterest )
 
 
@@ -86,7 +89,7 @@ countieswithindrivingdistance <- function(
 
   distance  <- sp::spDistsN1(
     as.matrix(countycenters[,1:2])
-    , as.numeric(placeofinterest %>% select(lon, lat))
+    , as.numeric(placeofinterest %>% select(lng, lat))
     , longlat = T
   ) %>%
     magrittr::multiply_by(.6) # to convert km to miles
@@ -112,23 +115,45 @@ countieswithindrivingdistance <- function(
 
     message(paste("\nFinding driving distance from county centers to", centerlocation, "---------------------------\n\n"))
 
-    revcodedcounties  <- nearbycounties %>%
-      left_join(bannerizedfips, by = c('STATEFP' = 'state_code', 'COUNTYFP' = 'county_code')) %>%
-      mutate(countyname = paste(NAME, "County,", state)) %>%
-      magrittr::extract2('countyname')
+    # it'd be nice to add some messaging here so can get a sense of where you're at
+    drivingtimetodest  <- purrr::pmap_chr(nearbycounties, ~
+        googleway::google_distance(
+            origins = c(..2, ..1)
+          , destinations = placeofinterest$placename
+          , key = key
+        ) %>%
+        pluck("rows", "elements", 1, "duration", "text" )
+      )  %>%
+      as.duration()
 
-
-    drivingdistance  <- revcodedcounties %>%
-      ggmap::mapdist( to = placeofinterest$placename, mode = 'driving' )
-
+    nearbycounties$drivingtime  <- drivingtimetodest
 
     nearbycounties %<>%
-      bind_cols(drivingdistance) %>%
       mutate(
-        drivingtime = lubridate::dminutes(minutes)
-        , withinrange = drivingtime <= drivingcutoff
+          withinrange = drivingtime <= drivingcutoff
+        , minutes = as.numeric(drivingtime)/60
       ) %>%
       left_join(bannerizedfips %>% select(GEOID, bannercode), by='GEOID')
+
+
+
+    # revcodedcounties  <- nearbycounties %>%
+    #   left_join(bannerizedfips, by = c('STATEFP' = 'state_code', 'COUNTYFP' = 'county_code')) %>%
+    #   mutate(countyname = paste(NAME, "County,", state)) %>%
+    #   magrittr::extract2('countyname')
+    #
+    #
+    # drivingdistance  <- revcodedcounties %>%
+    #   ggmap::mapdist( to = placeofinterest$placename, mode = 'driving' )
+
+
+    # nearbycounties %<>%
+    #   bind_cols(drivingdistance) %>%
+    #   mutate(
+    #     drivingtime = lubridate::dminutes(minutes)
+    #     , withinrange = drivingtime <= drivingcutoff
+    #   ) %>%
+    #   left_join(bannerizedfips %>% select(GEOID, bannercode), by='GEOID')
 
 
 
