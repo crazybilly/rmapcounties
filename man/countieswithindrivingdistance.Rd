@@ -5,9 +5,9 @@
 \title{Counties within Driving Distance}
 \usage{
 countieswithindrivingdistance(centerlocation, drivingtime = 90,
-  considerationradius = drivingtime * 1.5, countymaps = NA,
-  fipscodes = NA, output = c("all", "nearbydf", "mapdata", "hobsonslist",
-  "map"))
+  considerationradius = drivingtime * 1.5, countymaps = NULL,
+  fipscodes = NULL, output = c("all", "nearbydf", "mapdata", "hobsonslist",
+  "map"), key = Sys.getenv("GOOGLE_MAPS_KEY"))
 }
 \arguments{
 \item{centerlocation}{a character string of a location acting as the center from which you want to measure}
@@ -21,6 +21,8 @@ countieswithindrivingdistance(centerlocation, drivingtime = 90,
 \item{fipscodes}{a data frame of fips codes for all counties with bannerized codes added. If NA, data from the tigris package is modified to work}
 
 \item{output}{a character vector describing what output you want. Available options include, "nearbydf", "mapdata", "hobsonslist" and "map"}
+
+\item{key}{a Google Maps user API key}
 }
 \value{
 if more than one output is selected, a list containing values of each. If only one output is selected, the object itself is returned, without being wrapped in a list. Outputs include:

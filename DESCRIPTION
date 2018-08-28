@@ -13,7 +13,8 @@ Imports:
     magrittr,
     leaflet,
     curl,
-    muadc
+    muadc,
+    purrr
 RoxygenNote: 6.0.1
 Suggests: knitr,
     rmarkdown

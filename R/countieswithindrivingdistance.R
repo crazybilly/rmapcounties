@@ -25,8 +25,8 @@ countieswithindrivingdistance <- function(
   centerlocation
   , drivingtime = 90
   , considerationradius = drivingtime * 1.5
-  , countymaps = NA
-  , fipscodes = NA
+  , countymaps = NULL
+  , fipscodes = NULL
   , output = c("all","nearbydf","mapdata","hobsonslist","map")
   , key = Sys.getenv('GOOGLE_MAPS_KEY')
 ){
@@ -39,7 +39,7 @@ countieswithindrivingdistance <- function(
 
   placeofinterest <- googleway::google_geocode(placeofinterest, key = key) %>%
     googleway::geocode_coordinates() %>%
-    mutate(placename = placeofinterest )
+    dplyr::mutate(placename = placeofinterest )
 
 
   # this probably ought to be bigger than you think it should be
@@ -53,7 +53,7 @@ countieswithindrivingdistance <- function(
 
   # get maps ----------------------------------------------------------------
 
-  if( is.na(countymaps)) {
+  if( is.null(countymaps)) {
     us.map  <- getcountymaps()
   } else {
     us.map  <- countymaps
@@ -61,7 +61,7 @@ countieswithindrivingdistance <- function(
 
   # get proper fips code ----------------------------------------------------
 
-  if( is.na(fipscodes)) {
+  if( is.null(fipscodes)) {
     bannerizedfips   <- makebannerizedfips()
   } else {
     bannerizedfips  <- fipscodes
@@ -75,28 +75,28 @@ countieswithindrivingdistance <- function(
     lapply( function(x){
 
       center  <- x@labpt
-      data_frame(
+      tibble::data_frame(
         lon = center[1]
         , lat = center[2]
       )
 
     }) %>%
-    bind_rows()  %>%
-    bind_cols(us.map@data)
+    dplyr::bind_rows()  %>%
+    dplyr::bind_cols(us.map@data)
 
 
   # narrow down distances ---------------------------------------------------
 
   distance  <- sp::spDistsN1(
-    as.matrix(countycenters[,1:2])
-    , as.numeric(placeofinterest %>% select(lng, lat))
+      as.matrix(countycenters[,1:2])
+    , as.numeric(placeofinterest %>% dplyr::select(lng, lat))
     , longlat = T
   ) %>%
     magrittr::multiply_by(.6) # to convert km to miles
 
   nearbycounties  <- countycenters %>%
     magrittr::inset("distance", value = distance) %>%
-    filter(distance <= generalcutoffinmiles)
+    dplyr::filter(distance <= generalcutoffinmiles)
 
 
 
@@ -116,52 +116,34 @@ countieswithindrivingdistance <- function(
     message(paste("\nFinding driving distance from county centers to", centerlocation, "---------------------------\n\n"))
 
     # it'd be nice to add some messaging here so can get a sense of where you're at
-    drivingtimetodest  <- purrr::pmap_chr(nearbycounties, ~
-        googleway::google_distance(
-            origins = c(..2, ..1)
-          , destinations = placeofinterest$placename
-          , key = key
-        ) %>%
-        pluck("rows", "elements", 1, "duration", "text" )
-      )  %>%
-      as.duration()
+    drivingtimetodest  <- nearbycounties %>%
+      dplyr::select(lat, lon) %>%
+      dplyr::mutate(rowid = dplyr::row_number() ) %>%
+      tidyr::nest(-rowid) %>%
+      dplyr::mutate(
+        geoinfo = purrr::map2(data, rowid, ~
+            google_distance_loud(.x, .y, thisdest = placeofinterest$placename, thiskey = key )
+        )
+        , drivingtime = purrr::map(geoinfo, getdrivingtime)
+      )
 
-    nearbycounties$drivingtime  <- drivingtimetodest
+    nearbycounties$drivingtime  <- drivingtimetodest$drivingtime %>%
+      unlist() %>%
+      as_duration()
 
     nearbycounties %<>%
-      mutate(
+      dplyr::mutate(
           withinrange = drivingtime <= drivingcutoff
         , minutes = as.numeric(drivingtime)/60
       ) %>%
-      left_join(bannerizedfips %>% select(GEOID, bannercode), by='GEOID')
-
-
-
-    # revcodedcounties  <- nearbycounties %>%
-    #   left_join(bannerizedfips, by = c('STATEFP' = 'state_code', 'COUNTYFP' = 'county_code')) %>%
-    #   mutate(countyname = paste(NAME, "County,", state)) %>%
-    #   magrittr::extract2('countyname')
-    #
-    #
-    # drivingdistance  <- revcodedcounties %>%
-    #   ggmap::mapdist( to = placeofinterest$placename, mode = 'driving' )
-
-
-    # nearbycounties %<>%
-    #   bind_cols(drivingdistance) %>%
-    #   mutate(
-    #     drivingtime = lubridate::dminutes(minutes)
-    #     , withinrange = drivingtime <= drivingcutoff
-    #   ) %>%
-    #   left_join(bannerizedfips %>% select(GEOID, bannercode), by='GEOID')
-
+      dplyr::left_join(bannerizedfips %>% dplyr::select(GEOID, bannercode), by='GEOID')
 
 
     # output for Hobsons filter writing ---------------------------------------
 
 
     hobsonslist  <- nearbycounties %>%
-      filter(withinrange)
+      dplyr::filter(withinrange)
 
     hobsonslist  <- paste(hobsonslist$bannercode, collapse = "~")
 
@@ -169,19 +151,19 @@ countieswithindrivingdistance <- function(
 
     # map stuff ---------------------------------------------------------------
 
-    countyindex  <- us.map@data$GEOID %in% (nearbycounties %>% filter(withinrange) %>% magrittr::extract2("GEOID") )
+    countyindex  <- us.map@data$GEOID %in% (nearbycounties %>% dplyr::filter(withinrange) %>% magrittr::extract2("GEOID") )
 
     nearbymap  <- us.map[countyindex, ]
 
     nearbymap@data  <- nearbymap@data %>%
-      left_join(
+      dplyr::left_join(
         nearbycounties %>%
-          select(GEOID, minutes)
+          dplyr::select(GEOID, minutes)
         , by = 'GEOID'
       )
 
 
-    nearbyminutes  <- nearbycounties %>% filter(withinrange) %>% magrittr::extract2("minutes")
+    nearbyminutes  <- nearbycounties %>% dplyr::filter(withinrange) %>% magrittr::extract2("minutes")
 
     if(length(nearbyminutes) == 1) {
       nearbyminutes  <- c(nearbyminutes, nearbyminutes * 2)

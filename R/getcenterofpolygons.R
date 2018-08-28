@@ -10,7 +10,7 @@ getcenterofpolygons  <- function(polygons) {
   blob  <- rgeos::gUnaryUnion(polygons)
   center  <- blob@polygons[[1]]@labpt
 
-  data_frame(lon = center[1], lat = center[2])
+  dplyr::data_frame(lon = center[1], lat = center[2])
 
 }
 

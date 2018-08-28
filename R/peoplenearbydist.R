@@ -18,8 +18,8 @@ peoplenearbydist  <- function(locations, center, maxdist, key) {
 
   if(class(center) == 'character') {
 
-    centercoords  <- google_geocode(center, key = key) %>%
-      pluck("results", "geometry", "location")
+    centercoords  <- googleway::google_geocode(center, key = key) %>%
+      purrr::pluck("results", "geometry", "location")
 
   } else {
     centercoords  <- center
@@ -27,8 +27,8 @@ peoplenearbydist  <- function(locations, center, maxdist, key) {
 
 
   locations %>%
-    mutate(mapdist = distcalc(lon = lon, lat = lat, y = centercoords) ) %>%
-    filter(mapdist <= maxdisteuclidean)
+    dplyr::mutate(mapdist = distcalc(lon = lon, lat = lat, y = centercoords) ) %>%
+    dplyr::filter(mapdist <= maxdisteuclidean)
 
 }
 

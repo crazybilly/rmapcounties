@@ -16,11 +16,11 @@ mapregion  <- function(region, countymaps = NA, fipscodes = NA) {
   if(any(grepl("data.frame", class(region)) ) ) {
     myregion  <- region
   } else {
-    myregion  <- read.tidy(region)
+    myregion  <- muadc::read.tidy(region)
   }
 
   myregion %<>%
-    mutate(inregion = "#00FF00")
+    dplyr::mutate(inregion = "#00FF00")
 
 
 
@@ -42,14 +42,14 @@ mapregion  <- function(region, countymaps = NA, fipscodes = NA) {
 
 
   mapdata  <- bannerizedfips %>%
-    left_join(myregion, by='bannercode') %>%
-    mutate(
+    dplyr::left_join(myregion, by='bannercode') %>%
+    dplyr::mutate(
         inregion  = fillna(inregion, fill = '#CCCCCC')
       , popuptext = paste(county,bannercode,sep = '<br>')
     )
 
 
-  mapdata_full  <- left_join(us.map@data, mapdata, by=c("GEOID"))
+  mapdata_full  <- dplyr::left_join(us.map@data, mapdata, by=c("GEOID"))
 
   us.map2  <- us.map
   us.map2@data  <- mapdata_full
@@ -58,9 +58,9 @@ mapregion  <- function(region, countymaps = NA, fipscodes = NA) {
 
   # map the counties --------------------------------------------------------
 
-  leaflet(us.map2) %>%
-    addTiles() %>%
-    addPolygons(
+  leaflet::leaflet(us.map2) %>%
+    leaflet::addTiles() %>%
+    leaflet::addPolygons(
         fillColor = ~inregion
       , weight = .3
       , opacity = 1

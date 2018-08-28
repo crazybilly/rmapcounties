@@ -12,6 +12,6 @@
 #' @export
 #'
 distcalc  <- function(lon, lat, y) {
-  map_dbl(seq_along(lat), ~ matrix(c(lat[.x],lon[.x], y), nrow = 2, ncol=2, byrow = T) %>% dist %>% as.numeric   )
+  purrr::map_dbl(seq_along(lat), ~ matrix(c(lat[.x],lon[.x], y), nrow = 2, ncol=2, byrow = T) %>% dist %>% as.numeric   )
 }
 
