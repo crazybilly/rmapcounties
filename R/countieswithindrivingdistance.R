@@ -102,10 +102,13 @@ countieswithindrivingdistance <- function(
 
 # Allow user to abort if there's a ton of nearby counties -----------------
 
-  userabort  <- readline(paste("There are", nrow(nearbycounties), "nearby counties. What do you want to do? [A]bort or [C]ontinue? [C] ") ) %>%
-      tolower()
+  userabort  <- rstudioapi::showQuestion(
+      title = 'Continue Geocoding?'
+    , message = paste("There are", nrow(nearbycounties), "nearby counties. What do you want to do?")
+    , ok = 'Continue'
+  )
 
-  if(userabort == 'a') {
+  if(!userabort ) {
 
       stop(return(nearbycounties))
 

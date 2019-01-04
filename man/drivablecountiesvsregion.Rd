@@ -5,8 +5,8 @@
 \title{Compare an Existing Region to a List of Drivable Counties}
 \usage{
 drivablecountiesvsregion(regiondf, drivingdistance, countymaps = NA,
-  fipscodes = NA, output = c("nearbydf", "mapdata", "outsidecountiesdf",
-  "map"))
+  fipscodes = NA, output = c("nearbydf", "mapdata",
+  "outsidecountiesdf", "map"))
 }
 \arguments{
 \item{regiondf}{an existing data frame or a file URL}

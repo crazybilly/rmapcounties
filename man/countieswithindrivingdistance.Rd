@@ -6,8 +6,8 @@
 \usage{
 countieswithindrivingdistance(centerlocation, drivingtime = 90,
   considerationradius = drivingtime * 1.5, countymaps = NULL,
-  fipscodes = NULL, output = c("all", "nearbydf", "mapdata", "hobsonslist",
-  "map"), key = Sys.getenv("GOOGLE_MAPS_KEY"))
+  fipscodes = NULL, output = c("all", "nearbydf", "mapdata",
+  "hobsonslist", "map"), key = Sys.getenv("GOOGLE_MAPS_KEY"))
 }
 \arguments{
 \item{centerlocation}{a character string of a location acting as the center from which you want to measure}

@@ -15,7 +15,7 @@ Imports:
     curl,
     muadc,
     purrr
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
