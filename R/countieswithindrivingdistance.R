@@ -71,18 +71,14 @@ countieswithindrivingdistance <- function(
   # get county centers ------------------------------------------------------
 
 
-  countycenters  <- us.map@polygons %>%
-    lapply( function(x){
-
-      center  <- x@labpt
-      tibble::data_frame(
-        lon = center[1]
-        , lat = center[2]
-      )
-
-    }) %>%
-    dplyr::bind_rows()  %>%
-    dplyr::bind_cols(us.map@data)
+  countycenters  <- us.map$geometry %>%
+    purrr::map_dfr(~ tibble(
+        lon = sf::st_centroid(.x)[1]
+      , lat = sf::st_centroid(.x)[2]
+    )
+    ) %>%
+    dplyr::bind_cols(us.map)
+    # dplyr::bind_cols(us.map@data)
 
 
   # narrow down distances ---------------------------------------------------
@@ -154,11 +150,11 @@ countieswithindrivingdistance <- function(
 
     # map stuff ---------------------------------------------------------------
 
-    countyindex  <- us.map@data$GEOID %in% (nearbycounties %>% dplyr::filter(withinrange) %>% magrittr::extract2("GEOID") )
+    countyindex  <- us.map$GEOID %in% (nearbycounties %>% dplyr::filter(withinrange) %>% magrittr::extract2("GEOID") )
 
     nearbymap  <- us.map[countyindex, ]
 
-    nearbymap@data  <- nearbymap@data %>%
+    nearbymap  <- nearbymap %>%
       dplyr::left_join(
         nearbycounties %>%
           dplyr::select(GEOID, minutes)
@@ -198,7 +194,7 @@ countieswithindrivingdistance <- function(
     class(alloutput)  <- c("list","drivingdistance")
 
 
-    if(grepl("all",output) ) {
+    if(any(grepl("all",output)) ) {
       return(alloutput)
     } else if(length(output) > 1) {
       return(alloutput[output])

@@ -52,7 +52,8 @@ getcountymaps  <- function(
   message(paste("shplocation = ", shplocation,"\n"))
   # Download county shape file from Tiger.
   # https://www.census.gov/geo/maps-data/data/cbf/cbf_counties.html
-  us.map <- rgdal::readOGR(dsn =path.expand(shplocation), layer = "cb_2022_us_county_20m", stringsAsFactors = FALSE)
+  # us.map <- rgdal::readOGR(dsn =path.expand(shplocation), layer = "cb_2022_us_county_20m", stringsAsFactors = FALSE)
+  us.map <- sf::read_sf(dsn =path.expand(shplocation), layer = "cb_2022_us_county_20m", stringsAsFactors = FALSE)
 
   if(continentalonly) {
     # Remove Alaska(2), Hawaii(15), Puerto Rico (72), Guam (66), Virgin Islands (78), American Samoa (60)
