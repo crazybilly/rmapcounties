@@ -4,9 +4,13 @@
 \alias{getcountymaps}
 \title{Get County Map}
 \usage{
-
-  getcountymaps(filelocation = "https://www2.census.gov/geo/tiger/GENZ2016/shp/cb_2016_us_county_20m.zip",
-  dest = "data", local = F, continentalonly = T)
+getcountymaps(
+  filelocation =
+    "https://www2.census.gov/geo/tiger/GENZ2022/shp/cb_2022_us_county_20m.zip",
+  dest = "data",
+  local = F,
+  continentalonly = T
+)
 }
 \arguments{
 \item{filelocation}{a character string describing where to get the shape files. By default, assumes the files should be downloaed from the US Census Bureau at https://www.census.gov/geo/maps-data/data/cbf/cbf_counties.html. Local file addresses can also be used.}

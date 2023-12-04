@@ -7,7 +7,7 @@
 #'
 #' @return a spatialPolygonsDataFrame of the region. As a side effect, generates a leaflet map of the counties
 #' @import leaflet
-#' @importFrom muadc read.tidy
+#' @importFrom ucbudar read.tidy
 #' @export
 #'
 mapregion  <- function(region, countymaps = NA, fipscodes = NA) {
@@ -16,7 +16,7 @@ mapregion  <- function(region, countymaps = NA, fipscodes = NA) {
   if(any(grepl("data.frame", class(region)) ) ) {
     myregion  <- region
   } else {
-    myregion  <- muadc::read.tidy(region)
+    myregion  <- ucbudar::read.tidy(region)
   }
 
   myregion %<>%

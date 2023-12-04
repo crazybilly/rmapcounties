@@ -4,8 +4,7 @@
 \alias{google_distance_loud}
 \title{Get Driving Distance to/from a place}
 \usage{
-google_distance_loud(x, y, thisdest = placeofinterest$placename,
-  thiskey = key)
+google_distance_loud(x, y, thisdest = placeofinterest$placename, thiskey = key)
 }
 \arguments{
 \item{x}{a one row, two column data_frame with lat and lon columns in that order}
@@ -15,9 +14,6 @@ google_distance_loud(x, y, thisdest = placeofinterest$placename,
 \item{thisdest}{the destination}
 
 \item{thiskey}{a Google Maps API key}
-}
-\value{
-
 }
 \description{
 a version of googleway::google_distance that messages where you're at. Used in countieswithindrivingdistance(), not exported.

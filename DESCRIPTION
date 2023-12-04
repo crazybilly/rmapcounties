@@ -13,9 +13,9 @@ Imports:
     magrittr,
     leaflet,
     curl,
-    muadc,
+    ucbudar,
     purrr
-RoxygenNote: 6.1.0
+RoxygenNote: 7.2.3
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
